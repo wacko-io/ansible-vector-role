@@ -1,0 +1,27 @@
+---
+- name: Prepare
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Change Ubuntu mirror and install Python
+      raw: |
+        sed -i 's/archive.ubuntu.com/mirror.yandex.ru/g' /etc/apt/sources.list 2>/dev/null || true
+        sed -i 's/security.ubuntu.com/mirror.yandex.ru/g' /etc/apt/sources.list 2>/dev/null || true
+        sed -i 's/archive.ubuntu.com/mirror.yandex.ru/g' /etc/apt/sources.list.d/ubuntu.sources 2>/dev/null || true
+        sed -i 's/security.ubuntu.com/mirror.yandex.ru/g' /etc/apt/sources.list.d/ubuntu.sources 2>/dev/null || true
+        apt-get update && apt-get install -y python3 sudo
+      when: "'ubuntu' in inventory_hostname"
+      changed_when: false
+
+    - name: Install Python on Oracle Linux
+      raw: dnf module enable -y python39 && dnf install -y python39 sudo
+      when: "'oracle' in inventory_hostname"
+      changed_when: false
+
+    - name: Trick Ansible to ignore systemctl inside Docker
+      raw: |
+        echo '#!/bin/sh' > /usr/bin/systemctl
+        echo 'exit 0' >> /usr/bin/systemctl
+        chmod +x /usr/bin/systemctl
+        mkdir -p /run/systemd/system
+      changed_when: false
