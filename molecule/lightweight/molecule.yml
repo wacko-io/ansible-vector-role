@@ -9,11 +9,6 @@ platforms:
     pre_build_image: true
     command: sleep infinity
     privileged: true
-  - name: oraclelinux-8
-    image: oraclelinux:8
-    pre_build_image: true
-    command: sleep infinity
-    privileged: true
 
 provisioner:
   name: ansible
